@@ -1,0 +1,11 @@
+services:
+  app:
+    image: financial-analyzer
+    container_name: financial-analyzer-container
+    ports:
+      - "8081:8080"
+    environment:
+      DB_URL: jdbc:postgresql://host.docker.internal:5432/financial_analyzer
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
