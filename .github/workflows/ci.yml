@@ -20,6 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Give execute permission to Maven wrapper
+        working-directory: financial-analyzer
+        run: chmod +x mvnw
+
       - name: Build and run tests
         working-directory: financial-analyzer
         run: ./mvnw clean test
