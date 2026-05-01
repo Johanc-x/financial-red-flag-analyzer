@@ -21,4 +21,5 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and run tests
+        working-directory: financial-analyzer
         run: ./mvnw clean test
