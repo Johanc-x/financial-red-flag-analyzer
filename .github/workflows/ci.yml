@@ -27,3 +27,7 @@ jobs:
       - name: Build backend
         working-directory: financial-analyzer
         run: ./mvnw clean package -DskipTests
+
+      - name: Build Docker image
+        working-directory: financial-analyzer
+        run: docker build -t financial-analyzer .
