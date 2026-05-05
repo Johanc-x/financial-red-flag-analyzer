@@ -15,6 +15,8 @@ public class AnalysisService {
     
     @Autowired
     private AnalysisRepository analysisRepository;
+    @Autowired
+    private MlPredictionService mlPredictionService;
     
     public AnalysisResponse analyze(AnalysisRequest request) {
 
@@ -103,6 +105,18 @@ public class AnalysisService {
         entity.setCreatedAt(LocalDateTime.now());
 
         analysisRepository.save(entity);
+        
+        try {
+            MlPredictionResponse ml = mlPredictionService.predict(request);
+
+            response.setMlRiskLevel(ml.getRisk_level());
+            response.setMlConfidence(ml.getRisk_confidence());
+            response.setMlSummary(ml.getHuman_summary());
+            response.setMlRecommendation(ml.getRecommended_action());
+
+        } catch (Exception e) {
+            System.out.println("ML service not available, using fallback logic.");
+        }
         
         return response;
     }

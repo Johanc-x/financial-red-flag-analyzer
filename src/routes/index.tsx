@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { analyze, type AnalysisResult, type FinancialInput } from "@/lib/analyzer";
+import { analyzeWithBackend, type AnalysisResult, type FinancialInput } from "@/lib/analyzer";
 import { InputPanel } from "@/components/analyzer/InputPanel";
 import { MetricsGrid } from "@/components/analyzer/MetricsGrid";
 import { RedFlagsPanel } from "@/components/analyzer/RedFlagsPanel";
@@ -9,6 +9,7 @@ import { Charts } from "@/components/analyzer/Charts";
 import { ExecutiveSummary } from "@/components/analyzer/ExecutiveSummary";
 import { ScopeNotice } from "@/components/analyzer/ScopeNotice";
 import { LineChart, Sparkles } from "lucide-react";
+import { LoginScreen } from "@/components/analyzer/LoginScreen";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,16 +32,31 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("token") !== null;
+});
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const handleRun = (data: FinancialInput) => {
-    setResult(analyze(data));
-    requestAnimationFrame(() => {
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
+  const handleRun = async (data: FinancialInput) => {
+  try {
+    const result = await analyzeWithBackend(data, localStorage.getItem("token") ?? undefined);
+    setResult(result);
+  } catch (error) {
+    console.error("Error calling backend:", error);
+    alert("Backend connection failed. Please login or check that the backend and ML service are running.");
+  }
+
+  requestAnimationFrame(() => {
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+};
 
   const hasResult = useMemo(() => result !== null, [result]);
+
+  if (!isAuthenticated) {
+  return <LoginScreen onLoginSuccess={() => setIsAuthenticated(true)} />;
+}
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,10 +72,26 @@ function Index() {
               <p className="text-xs text-muted-foreground hidden sm:block">Decision support for unusual financial patterns</p>
             </div>
           </div>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground border border-border/70 rounded-full px-3 py-1">
-            <Sparkles className="size-3 text-primary" />
-            Analytical preview
-          </span>
+          <div className="flex items-center gap-3">
+           <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground border border-border/70 rounded-full px-3 py-1">
+              <Sparkles className="size-3 text-primary" />
+              Analytical preview
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("token");
+                }
+                setIsAuthenticated(false);
+                setResult(null);
+              }}
+              className="text-xs font-medium border border-border/70 rounded-full px-3 py-1.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

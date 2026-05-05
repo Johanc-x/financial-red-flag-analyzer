@@ -218,3 +218,41 @@ export function analyze(input: FinancialInput): AnalysisResult {
   const trend = buildTrend(input);
   return { metrics, redFlags, riskScore, summary, trend };
 }
+
+export async function analyzeWithBackend(input: FinancialInput, token?: string): Promise<AnalysisResult> {
+  const response = await fetch("http://localhost:8081/api/analysis", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      revenue: input.revenue,
+      costs: input.costs,
+      ebitda: input.ebitda,
+      cashFlow: input.cashFlow,
+      debt: input.debt,
+      equity: input.equity,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Backend error: ${response.status}`);
+  }
+
+  const backend = await response.json();
+
+  const local = analyze(input);
+
+  return {
+    ...local,
+    riskScore: backend.riskScore ?? local.riskScore,
+    summary: backend.mlSummary ?? backend.summary ?? local.summary,
+    metrics: {
+      ...local.metrics,
+      ebitdaMargin: backend.ebitdaMargin ?? local.metrics.ebitdaMargin,
+      debtToEquity: backend.debtToEquity ?? local.metrics.debtToEquity,
+      cashConversion: backend.cashConversion ?? local.metrics.cashConversion,
+    },
+  };
+}

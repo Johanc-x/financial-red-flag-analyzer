@@ -10,6 +10,10 @@ public class AnalysisResponse {
     private int riskScore;
     private List<RedFlagResponse> redFlags;
     private String summary;
+    private String mlRiskLevel;
+    private double mlConfidence;
+    private String mlSummary;
+    private String mlRecommendation;
 
     public double getEbitdaMargin() { return ebitdaMargin; }
     public void setEbitdaMargin(double ebitdaMargin) { this.ebitdaMargin = ebitdaMargin; }
@@ -28,4 +32,16 @@ public class AnalysisResponse {
 
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+    
+    public String getMlRiskLevel() { return mlRiskLevel; }
+    public void setMlRiskLevel(String mlRiskLevel) { this.mlRiskLevel = mlRiskLevel; }
+
+    public double getMlConfidence() { return mlConfidence; }
+    public void setMlConfidence(double mlConfidence) { this.mlConfidence = mlConfidence; }
+
+    public String getMlSummary() { return mlSummary; }
+    public void setMlSummary(String mlSummary) { this.mlSummary = mlSummary; }
+
+    public String getMlRecommendation() { return mlRecommendation; }
+    public void setMlRecommendation(String mlRecommendation) { this.mlRecommendation = mlRecommendation; }
 }

@@ -1,6 +1,8 @@
 package com.johan.financialanalyzer.auth;
 
+import com.johan.financialanalyzer.model.User;
 import com.johan.financialanalyzer.security.JwtService;
+import com.johan.financialanalyzer.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -8,21 +10,23 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final JwtService jwtService;
+    private final AuthService authService;
 
-    public AuthController(JwtService jwtService) {
+    public AuthController(JwtService jwtService, AuthService authService) {
         this.jwtService = jwtService;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
 
-        if ("admin".equals(request.getUsername()) &&
-            "password123".equals(request.getPassword())) {
+        User user = authService.authenticate(
+                request.getUsername(), 
+                request.getPassword()
+        );
 
-            String token = jwtService.generateToken(request.getUsername());
-            return new LoginResponse(token);
-        }
+        String token = jwtService.generateToken(user.getUsername());
 
-        throw new RuntimeException("Invalid credentials");
+        return new LoginResponse(token);
     }
 }
