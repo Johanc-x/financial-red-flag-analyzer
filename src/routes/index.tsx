@@ -34,13 +34,13 @@ function Index() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem("token") !== null;
+  return sessionStorage.getItem("token") !== null;
 });
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleRun = async (data: FinancialInput) => {
   try {
-    const result = await analyzeWithBackend(data, localStorage.getItem("token") ?? undefined);
+    const result = await analyzeWithBackend(data, sessionStorage.getItem("token") ?? undefined);
     setResult(result);
   } catch (error) {
     console.error("Error calling backend:", error);
@@ -82,7 +82,7 @@ function Index() {
               type="button"
               onClick={() => {
                 if (typeof window !== "undefined") {
-                  localStorage.removeItem("token");
+                  sessionStorage.removeItem("token");
                 }
                 setIsAuthenticated(false);
                 setResult(null);

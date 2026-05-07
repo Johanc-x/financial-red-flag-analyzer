@@ -43,7 +43,7 @@ export function LoginScreen({ onLoginSuccess }: Props) {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token);
+      sessionStorage.setItem("token", data.token);
       onLoginSuccess();
     } catch (err) {
       console.error(err);

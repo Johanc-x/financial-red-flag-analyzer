@@ -96,7 +96,7 @@ const parseSeries = (s: string): number[] | undefined => {
 };
 
 export function InputPanel({ onRun }: Props) {
-  const [form, setForm] = useState<FormState>(presets.liquidity.data);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
   const update = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -126,14 +126,14 @@ export function InputPanel({ onRun }: Props) {
 
   const reset = () => setForm(emptyForm);
 
-  const fields: { key: keyof FormState; label: string }[] = [
-    { key: "revenue", label: "Revenue" },
-    { key: "costs", label: "Costs" },
-    { key: "ebitda", label: "EBITDA" },
-    { key: "cashFlow", label: "Cash Flow" },
-    { key: "debt", label: "Debt" },
-    { key: "equity", label: "Equity" },
-  ];
+  const fields: { key: keyof FormState; label: string; placeholder: string }[] = [
+  { key: "revenue", label: "Revenue", placeholder: "e.g. 1200000" },
+  { key: "costs", label: "Costs", placeholder: "e.g. 950000" },
+  { key: "ebitda", label: "EBITDA", placeholder: "e.g. 180000" },
+  { key: "cashFlow", label: "Cash Flow", placeholder: "e.g. -40000" },
+  { key: "debt", label: "Debt", placeholder: "e.g. 600000" },
+  { key: "equity", label: "Equity", placeholder: "e.g. 350000" },
+];
 
   return (
     <Card className="shadow-[var(--shadow-soft)] border-border/60">
@@ -177,7 +177,7 @@ export function InputPanel({ onRun }: Props) {
                   inputMode="decimal"
                   value={form[f.key]}
                   onChange={update(f.key)}
-                  placeholder="0"
+                  placeholder={f.placeholder}
                 />
               </div>
             ))}
